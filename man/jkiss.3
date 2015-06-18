@@ -1,2 +1,34 @@
-.Dd $MDocdate: June ?? 2015 $
-TODO
+.Dd $MDocdate: June 18 2015 $
+.Dt LIBJKISS 3
+.Os
+.Sh NAME
+.Nm jkiss64_init ,
+.Nm jkiss64_rand
+.Nd 64-bit KISS rng with pthread support
+.Sh SYNOPSIS
+.In jkiss.h
+.Ft void
+.Fn jkiss64_init "void"
+.Ft uint64_t
+.Fn jkiss64_rand "void"
+.Sh DESCRIPTION
+A 64-bit KISS pseudo-random number generator with pthread support; each thread
+will use its own seed. The
+.Fn jkiss64_init
+call must be made once per process, for example in the main thread, or in a
+.Fn pthread_atfork
+child process handler. Subsequently, threads in that process may call
+.Fn jkiss64_rand
+to obtain a pseudo-random value. The seed is set either via
+.Xr arc4random
+calls or with data from the random device file, depending on how the library
+was compiled.
+.Sh SEE ALSO
+.Xr arc4random 3
+.Rs
+.%A David Jones
+.%D May 7 2010
+.%T Good Practice in (Pseudo) Random Number Generation for Bioinformatics Applications
+.Re
+.Sh AUTHORS
+.An Jeremy Mates

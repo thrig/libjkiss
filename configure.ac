@@ -2,9 +2,25 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.60])
-AC_INIT([libjkiss], [1], [https://github.com/thrig/libjkiss])
+AC_INIT([libjkiss], [1])
 AC_CONFIG_SRCDIR([lib/jkiss.c])
 AC_CONFIG_HEADERS([config.h])
+
+m4_include(m4/macros/with.m4)
+
+ARG_WITH_SUBST([random-device],
+  [/dev/random],
+  [set the device to read real random data from])
+
+AC_ARG_WITH([libbsd],
+  [AS_HELP_STRING([--with-libbsd],[Include -lbsd])],
+  [jkiss_libbsd="yes"],
+  [])
+
+if test "x$jkiss_libbsd" = "xyes"; then
+  AC_DEFINE(JKISS_LIBBSD, 1, [Enable -lbsd])
+fi
+AM_CONDITIONAL(JKISS_LIBBSD, test "x$jkiss_libbsd" = "xyes")
 
 AC_CONFIG_AUX_DIR([build-aux])
 # NOTE older versions of auto* require that one manually mkdir this dir

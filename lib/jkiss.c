@@ -10,23 +10,24 @@
 
 #include "jkiss.h"
 
+#ifndef DEV_RANDOM
+# define DEV_RANDOM "/dev/random"
+#endif
+
 void jkiss64_thread_cleanup(void *key);
 
 pthread_key_t Thread_Seed;
-struct jkiss64_seed {
+typedef struct jkiss64_seed {
     uint64_t x;
     uint64_t y;
     uint32_t c1;
     uint32_t c2;
     uint32_t z1;
     uint32_t z2;
-};
-
-typedef jkiss64_seed_t struct jkiss64_seed
+} jkiss64_seed_t;
 
 void jkiss64_init(void)
 {
-    // TODO tho would presumably need destructor to free seed struct?
     pthread_key_create(&Thread_Seed, jkiss64_thread_cleanup);
 }
 
@@ -51,8 +52,7 @@ uint64_t jkiss64_rand(void)
             seed->y = arc4random() | ((uint64_t) arc4random() << 32);
         }
 #else
-        // TODO must also detect for this for portability reasons
-        int fd = open("/dev/random", O_RDONLY);
+        int fd = open(DEV_RANDOM, O_RDONLY);
         if (fd == -1)
             abort();
         if (read(fd, &seed->x, sizeof(uint64_t)) != sizeof(uint64_t))
