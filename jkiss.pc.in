@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: jkiss
+Description: 64-bit KISS rng with pthread support
+Version: @PACKAGE_VERSION@
+Libs: -L${libdir} -ljkiss
+Cflags: -I${includedir}

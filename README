@@ -1,0 +1,39 @@
+libjkiss - 64-bit KISS rng with pthread support
+
+Build and install along the lines of:
+
+  export AUTOMAKE_VERSION=1.15
+  export AUTOCONF_VERSION=2.69
+  autoreconf -i
+  ./configure [--prefix=...] && make && make install
+
+
+The primary functions of this library are jkiss_init() and jkiss_rand();
+the first of these should be called once, perhaps in the main thread
+before the others are started, and the second is used to obtain a random
+value. Each thread will use its own seed, set randomly via arc4random(3)
+or via the /dev/random device. The period of this RNG function is ~
+2**250, so repeats due to long running processes that make heavy use of
+the RNG are unlikely. Consult jkiss(3) for additional documentation.
+
+
+Bugs and feature requests should be directed to:
+
+https://github.com/thrig/libjkiss
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015 Jeremy Mates
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
