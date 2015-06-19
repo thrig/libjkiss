@@ -1,9 +1,12 @@
 /*
- # Public domain JLKISS64 implementation - KISS pseudo-random number
+ # Public domain JLKISS64 implementation - a KISS pseudo-random number
  # generator (pRNG) with 64-bit operations and thread-independent seeding.
  # Each pthread will use a different seed set. The period of this pRNG is
  # ~2**250 so only extremely long-running threads that make extremely heavy
- # use of the pRNG will likely need to reseed.
+ # use of the pRNG will likely need to reseed. The caller may supply a
+ # custom seed initialization function; otherwise, the seed is set from
+ # arc4random(3) calls, or if that is not available, by reading from a
+ # random device.
  */
 
 #include "jkiss.h"
@@ -12,20 +15,11 @@
 #define DEV_RANDOM "/dev/random"
 #endif
 
+void (*Re_Seed) (jkiss64_seed_t * seed);
+pthread_key_t Thread_Seed;
+
 void jkiss64_seeder(jkiss64_seed_t * seed);
 void jkiss64_thread_cleanup(void *seed);
-
-void *Re_Seed;
-pthread_key_t Thread_Seed;
-typedef struct jkiss64_seed {
-    bool seeded;
-    uint64_t x;
-    uint64_t y;
-    uint32_t c1;
-    uint32_t c2;
-    uint32_t z1;
-    uint32_t z2;
-} jkiss64_seed_t;
 
 /************************************************************************
  *
@@ -33,7 +27,7 @@ typedef struct jkiss64_seed {
  *
  */
 
-int jkiss64_init(void *(*seed_func) (jkiss64_seed_t * seed))
+int jkiss64_init(void (*seed_func) (jkiss64_seed_t * seed))
 {
     int r;
     if ((r = pthread_key_create(&Thread_Seed, jkiss64_thread_cleanup)) != 0)
@@ -85,19 +79,23 @@ void jkiss64_reseed(void)
  *
  */
 
-// may need second void * arg for arbitrary user-supplied stuff?
 void jkiss64_seeder(jkiss64_seed_t * seed)
 {
-    seed->c1 = 6543217;
-    seed->c2 = 43219876;
-    seed->z1 = 1732654;
-    seed->z2 = 21987643;
-    seed->y = 0;
-
 #ifdef HAVE_ARC4RANDOM
     seed->x = arc4random() | ((uint64_t) arc4random() << 32);
+    seed->y = 0;
     while (seed->y == 0) {
         seed->y = arc4random() | ((uint64_t) arc4random() << 32);
+    }
+    seed->c1 = seed->z1 = 0;
+    while (seed->c1 == 0 && seed->z1 == 0) {
+        seed->c1 = arc4random();
+        seed->z1 = arc4random();
+    }
+    seed->c2 = seed->z2 = 0;
+    while (seed->c2 == 0 && seed->z2 == 0) {
+        seed->c2 = arc4random();
+        seed->z2 = arc4random();
     }
 #else
     int fd = open(DEV_RANDOM, O_RDONLY);
@@ -107,6 +105,20 @@ void jkiss64_seeder(jkiss64_seed_t * seed)
         abort();
     while (seed->y == 0) {
         if (read(fd, &seed->y, sizeof(uint64_t)) != sizeof(uint64_t))
+            abort();
+    }
+    seed->c1 = seed->z1 = 0;
+    while (seed->c1 == 0 && seed->z1 == 0) {
+        if (read(fd, &seed->c1, sizeof(uint32_t)) != sizeof(uint32_t))
+            abort();
+        if (read(fd, &seed->z1, sizeof(uint32_t)) != sizeof(uint32_t))
+            abort();
+    }
+    seed->c2 = seed->z2 = 0;
+    while (seed->c2 == 0 && seed->z2 == 0) {
+        if (read(fd, &seed->c2, sizeof(uint32_t)) != sizeof(uint32_t))
+            abort();
+        if (read(fd, &seed->z2, sizeof(uint32_t)) != sizeof(uint32_t))
             abort();
     }
 #endif
