@@ -1,4 +1,4 @@
-/* libjkiss example; two threads each with custom seed set by this code */
+/* libjkiss example; threads each with a custom seed set by set_seed, below. */
 
 #include <sys/time.h>
 
@@ -34,7 +34,7 @@ int main(void)
 
     jkiss64_init(set_seed);
 
-    if ((tids = calloc(sizeof(pthread_t), (size_t)NUM_THREADS)) == NULL)
+    if ((tids = calloc(sizeof(pthread_t), (size_t) NUM_THREADS)) == NULL)
         err(EX_OSERR, "could not calloc() threads list");
 
     for (unsigned int i = 0; i < NUM_THREADS; i++) {
@@ -68,7 +68,7 @@ void set_seed(jkiss64_seed_t * seed)
 
 void *worker(void *threadnum)
 {
-    int x = (int)threadnum;
+    int x = (int) threadnum;
 
     for (unsigned int i = 0; i < ITERATIONS; i++) {
         printf("thread %d rand %llu\n", x, jkiss64_rand());

@@ -1,28 +1,41 @@
-.Dd $MDocdate: June 18 2015 $
+.Dd $MDocdate: June 19 2015 $
 .Dt LIBJKISS 3
 .Os
 .Sh NAME
 .Nm jkiss64_init ,
-.Nm jkiss64_rand
+.Nm jkiss64_rand ,
+.Nm jkiss64_reseed
 .Nd 64-bit KISS rng with pthread support
 .Sh SYNOPSIS
 .In jkiss.h
-.Ft void
-.Fn jkiss64_init "void"
+.Ft int
+.Fn jkiss64_init "void (*seed_func) (jkiss64_seed_t * seed)"
 .Ft uint64_t
 .Fn jkiss64_rand "void"
+.Ft void
+.Fn jkiss64_reseed "void"
 .Sh DESCRIPTION
-A 64-bit KISS pseudo-random number generator with pthread support; each thread
-will use its own seed. The
-.Fn jkiss64_init
-call must be made once per process, for example in the main thread, or in a
-.Fn pthread_atfork
-child process handler. Subsequently, threads in that process may call
-.Fn jkiss64_rand
-to obtain a pseudo-random value. The seed is set either via
-.Xr arc4random
-calls or with data from the random device file, depending on how the library
-was compiled.
+The primary functions of this library are
+.Fn jkiss_init
+and
+.Fn jkiss_rand .
+The first of these should be called once, perhaps in the main thread
+before the others are started, and the second is used to obtain a random
+value. Each thread will use its own seed, as set by the
+.Fn seed_func .
+The period of this RNG function is around 2**250, so repeats due to long
+running processes that make heavy use of the RNG are unlikely.
+.Pp
+The
+.Fn jkiss64_reseed
+function resets the seed of the thread it is called in. The seed is reseeded using the function pointer passed to
+.Fn jkiss_init ,
+or if that is
+.Dv NULL ,
+via a deault implementation that depending on compile options and
+platform specifics seeds via
+.Xr arc4random 3
+calls or by reading from a random device.
 .Sh SEE ALSO
 .Xr arc4random 3
 .Rs

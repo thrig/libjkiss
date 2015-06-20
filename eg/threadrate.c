@@ -1,8 +1,8 @@
 /* Test rate at which pRNG numbers can be generated. 
 
-On a "8" processor OpenBSD system (Intel(R) Core(TM) i7-2600 CPU @ 3.40GHz),
-using pthread_mutex_* locks around a single globally shared seed, the rate
-for pRNG calls in a tight loop was:
+On a "8" processor OpenBSD 5.7 system (Intel(R) Core(TM) i7-2600 CPU @
+3.40GHz), using pthread_mutex_* locks around a single globally shared
+seed, the rate for pRNG calls in a tight loop was:
 
 1 25425262.948
 2 74013.209
@@ -15,7 +15,16 @@ rate from there - but this is worst case, where the threads are doing
 nothing but nomming on random numbers. (Standard deviation also rises with
 increased numbers of threads, but that's not unexpected.)
 
-So instead went with a seed-per-thread implementation.
+So instead went with a seed-per-thread implementation, which does not slow
+down quite so significantly as the above does.
+
+  for t in 1 2 4 8 16; do
+    ./threadrate -c 1000000 -t $t \
+    | awk '{print $NF}' \
+    | r-fu summary - \
+    | grep elem \
+    | awk '{print $2, $4}';
+  done
 
 */
 
@@ -81,7 +90,7 @@ int main(int argc, char *argv[])
     if (Flag_Count == 0 || Flag_Threads == 0)
         emit_help();
 
-    jkiss64_init();
+    jkiss64_init(NULL);
 
     if ((tids = calloc(sizeof(pthread_t), Flag_Threads)) == NULL)
         err(EX_OSERR, "could not calloc() threads list");
@@ -106,7 +115,7 @@ int main(int argc, char *argv[])
     }
 
     for (unsigned long i = 0; i < Flag_Threads; i++) {
-        printf("dbg thread[%lu] @ %.6Lf\n", i, Thread_Rates[i]);
+        printf("thread[%lu] %.6Lf\n", i, Thread_Rates[i]);
     }
 
     exit(EXIT_SUCCESS);

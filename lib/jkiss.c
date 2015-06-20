@@ -1,12 +1,13 @@
 /*
- # Public domain JLKISS64 implementation - a KISS pseudo-random number
- # generator (pRNG) with 64-bit operations and thread-independent seeding.
- # Each pthread will use a different seed set. The period of this pRNG is
- # ~2**250 so only extremely long-running threads that make extremely heavy
- # use of the pRNG will likely need to reseed. The caller may supply a
- # custom seed initialization function; otherwise, the seed is set from
- # arc4random(3) calls, or if that is not available, by reading from a
- # random device.
+ # The primary functions of this library are jkiss_init() and
+ # jkiss_rand(); the first of these should be called once, perhaps in
+ # the main thread before the others are started, and the second is used
+ # to obtain a random value. Each thread will use its own seed, set
+ # randomly via arc4random(3) or via the /dev/random device. The period
+ # of this RNG function is ~ 2**250, so repeats due to long running
+ # processes that make heavy use of the RNG are unlikely. Consult
+ # jkiss(3) for additional documentation, or search under the eg/
+ # directory for example code.
  */
 
 #include "jkiss.h"
