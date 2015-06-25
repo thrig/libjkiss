@@ -1,11 +1,11 @@
-.Dd $MDocdate: June 19 2015 $
+.Dd $MDocdate: June 25 2015 $
 .Dt LIBJKISS 3
 .Os
 .Sh NAME
 .Nm jkiss64_init ,
 .Nm jkiss64_rand ,
 .Nm jkiss64_reseed
-.Nd 64-bit KISS rng with pthread support
+.Nd 64-bit KISS RNG with pthread support
 .Sh SYNOPSIS
 .In jkiss.h
 .Ft int
@@ -43,5 +43,6 @@ calls or by reading from a random device.
 .%D May 7 2010
 .%T Good Practice in (Pseudo) Random Number Generation for Bioinformatics Applications
 .Re
+Note that JKISS is not a cryptographic RNG; if cryptographically secure random bits are required, consider an alternative algorithm, such as the ISAAC cipher.
 .Sh AUTHORS
 .An Jeremy Mates
