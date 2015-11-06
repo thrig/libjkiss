@@ -74,6 +74,21 @@ void jkiss64_reseed(void)
         seed->seeded = false;
 }
 
+uint64_t jkiss64_uniform(uint64_t upper_bound)
+{
+    uint64_t max, rand;
+
+    if (upper_bound == 0) abort();
+
+    max = UINT64_MAX / upper_bound * upper_bound;
+
+    rand = jkiss64_rand();
+    while (rand > max) {
+        rand = jkiss64_rand();
+    }
+    return rand % upper_bound;
+}
+
 /************************************************************************
  *
  * Private Functions

@@ -2,6 +2,7 @@ libjkiss - 64-bit KISS rng with pthread support
 
 Build and install along the lines of:
 
+  unset CFLAGS
   export AUTOMAKE_VERSION=1.15
   export AUTOCONF_VERSION=2.69
   autoreconf -i

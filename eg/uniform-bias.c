@@ -4,7 +4,7 @@
  # statistical tests. With r-fu installed, such a test might run along
  # the lines of:
  #
- #   ./bias -c 99999 -R 99 -t 4 | r-fu equichisq -
+ #   ./uniform-bias -c 99999 -R 99 -t 4 | r-fu equichisq -
  #
  # where a p-value of 1 is good, and a very small number, not so.
  */
@@ -94,14 +94,14 @@ int main(int argc, char *argv[])
 
 void emit_help(void)
 {
-    fprintf(stderr, "Usage: ./bias -c count -R range -t threads\n");
+    fprintf(stderr, "Usage: ./uniform-bias -c count -R range -t threads\n");
     exit(EX_USAGE);
 }
 
 void *worker(void *unused)
 {
     for (unsigned long i = 0; i < Flag_Count; i++)
-        printf("%llu\n", jkiss64_rand() % Flag_Range);
+        printf("%llu\n", jkiss64_uniform(Flag_Range));
 
     pthread_mutex_lock(&Lock);
     Threads_Completed++;

@@ -24,6 +24,7 @@ typedef struct jkiss64_seed {
 
 int jkiss64_init(void (*seed_func) (jkiss64_seed_t * seed));
 uint64_t jkiss64_rand(void);
+uint64_t jkiss64_uniform(uint64_t upper_bound);
 void jkiss64_reseed(void);
 
 #endif

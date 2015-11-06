@@ -30,7 +30,7 @@ int main(void)
     pthread_t *tids;
     struct timespec wait;
 
-    setlinebuf(stdout);
+    setvbuf(stdout, (char *)NULL, _IOLBF, (size_t) 0);
 
     jkiss64_init(set_seed);
 

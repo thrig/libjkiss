@@ -1,10 +1,11 @@
-.Dd $MDocdate: June 25 2015 $
+.Dd $MDocdate: November 5 2015 $
 .Dt LIBJKISS 3
 .Os
 .Sh NAME
 .Nm jkiss64_init ,
 .Nm jkiss64_rand ,
-.Nm jkiss64_reseed
+.Nm jkiss64_reseed ,
+.Nm jkiss64_uniform
 .Nd 64-bit KISS RNG with pthread support
 .Sh SYNOPSIS
 .In jkiss.h
@@ -14,6 +15,8 @@
 .Fn jkiss64_rand "void"
 .Ft void
 .Fn jkiss64_reseed "void"
+.Ft uint64_t
+.Fn jkiss64_uniform "uint64_t upper_bound"
 .Sh DESCRIPTION
 The primary functions of this library are
 .Fn jkiss_init
@@ -25,6 +28,11 @@ value. Each thread will use its own seed, as set by the
 .Fn seed_func .
 The period of this RNG function is around 2**250, so repeats due to long
 running processes that make heavy use of the RNG are unlikely.
+.Pp
+.Fn jkiss64_uniform
+may be used to obtain a value between 0 and one less than the given
+.Ar upper_bound ,
+inclusive.
 .Pp
 The
 .Fn jkiss64_reseed

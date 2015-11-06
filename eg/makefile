@@ -7,5 +7,7 @@ customseed: customseed.c
 
 threadrate: threadrate.c
 
+uniform-bias: uniform-bias.c
+
 clean:
-	@-rm -f bias customseed threadrate 2>/dev/null
+	@-rm -f bias customseed threadrate uniform-bias 2>/dev/null
