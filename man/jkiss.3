@@ -1,16 +1,22 @@
-.Dd $MDocdate: November 5 2015 $
+.Dd June 20 2017
 .Dt LIBJKISS 3
 .Os
 .Sh NAME
+.Nm jkiss64_getseed ,
 .Nm jkiss64_init ,
+.Nm jkiss64_init_thread ,
 .Nm jkiss64_rand ,
 .Nm jkiss64_reseed ,
 .Nm jkiss64_uniform
-.Nd 64-bit KISS RNG with pthread support
+.Nd 64-bit KISS pRNG with pthread support
 .Sh SYNOPSIS
 .In jkiss.h
+.Ft jkiss64_seed_t *
+.Fn jkiss64_getseed "void"
 .Ft int
 .Fn jkiss64_init "void (*seed_func) (jkiss64_seed_t * seed)"
+.Ft int
+.Fn jkiss64_init_thread "void"
 .Ft uint64_t
 .Fn jkiss64_rand "void"
 .Ft void
@@ -18,32 +24,77 @@
 .Ft uint64_t
 .Fn jkiss64_uniform "uint64_t upper_bound"
 .Sh DESCRIPTION
-The primary functions of this library are
-.Fn jkiss_init
-and
-.Fn jkiss_rand .
-The first of these should be called once, perhaps in the main thread
-before the others are started, and the second is used to obtain a random
-value. Each thread will use its own seed, as set by the
-.Fn seed_func .
-The period of this RNG function is around 2**250, so repeats due to long
-running processes that make heavy use of the RNG are unlikely.
+This library implements a thread-specific 64-bit KISS pseudo-random
+number generator; a random seed is used or if necessary this can be set
+to a specific value. The period of this pRNG function is around 2**250;
+repeats due to long running processes that make heavy use of the RNG are
+unlikely (though "warming up" a particular seed may be advisable; see
+the paper by David Jones for details).
 .Pp
-.Fn jkiss64_uniform
-may be used to obtain a value between 0 and one less than the given
-.Ar upper_bound ,
-inclusive.
-.Pp
-The
-.Fn jkiss64_reseed
-function resets the seed of the thread it is called in. The seed is reseeded using the function pointer passed to
-.Fn jkiss_init ,
-or if that is
-.Dv NULL ,
-via a deault implementation that depending on compile options and
-platform specifics seeds via
+The main thread must call
+.Fn jkiss64_init
+once before any other function from this library are used; subsequent
+threads must thereafter first call
+.Fn jkiss64_init_thread
+before using any other call.
+.Bl -tag -width Ds
+.It Cm jkiss64_getseed
+Returns a pointer to the seed structure of the calling thread.
+.It Cm jkiss64_init
+Primary initialization function; call this from the main thread before
+any other calls to this library are made. A custom
+.Fn seed_func
+function can be passed instead of
+.Dv NULL
+to customize how the seed is set; the default seed function depending
+on how this library is compiled will seed from either a random device
+or via the
 .Xr arc4random 3
-calls or by reading from a random device.
+call.
+.It Cm jkiss64_init_thread
+Sub-thread initialization function; call this from subsequent threads after
+.Fn jkiss64_init
+has been called in the main thread and before any other calls are made.
+.It Cm jkiss64_rand
+Returns a pseudo-random 64-bit value.
+.It Cm jkiss64_reseed
+Calls the
+.Fn seed_func
+to reseed the seed structure.
+.It Cm jkiss64_uniform
+Returns a pseudo-random value less than the given upper bound. This
+should avoid any modulo bias. Note that modulo bias may be insignificant
+should the upper bound be significantly less than
+.Dv UINT64_MAX .
+.El
+.Sh SEED STRUCT
+Various fields in this structure must not be
+.Dv 0 ;
+study the internal
+.Fn jkiss64_seeder
+function and paper by David Jones to learn why.
+.Pp
+.Dl typedef struct jkiss64_seed {
+.Dl \& \& \& \&  uint64_t x;
+.Dl \& \& \& \&  uint64_t y;
+.Dl \& \& \& \&  uint32_t c1;
+.Dl \& \& \& \&  uint32_t c2;
+.Dl \& \& \& \&  uint32_t z1;
+.Dl \& \& \& \&  uint32_t z2;
+.Dl } jkiss64_seed_t;
+.Sh EXAMPLES
+Do check the init for errors
+.Pp
+.Dl #include <err.h>
+.Dl ...
+.Dl \& \& \& \&  if (jkiss64_init(NULL) != 0)
+.Dl \& \& \& \& \& \& \& \&  err(1, \&"jkiss init failed\&");
+.Pp
+and also on initialization in any subsequent threads.
+.Pp
+.Dl \& \& \& \&  if (jkiss64_init_thread() != 0)
+.Dl \& \& \& \& \& \& \& \&  err(1, \&"jkiss thread init failed\&");
+.Pp
 .Sh SEE ALSO
 .Xr arc4random 3
 .Rs
@@ -51,6 +102,15 @@ calls or by reading from a random device.
 .%D May 7 2010
 .%T Good Practice in (Pseudo) Random Number Generation for Bioinformatics Applications
 .Re
-Note that JKISS is not a cryptographic RNG; if cryptographically secure random bits are required, consider an alternative algorithm, such as the ISAAC cipher.
 .Sh AUTHORS
 .An Jeremy Mates
+.Sh CAVEATS
+JKISS is not a cryptographic RNG; if cryptographically secure random
+bits are required consider an alternative such as the ISAAC cipher.
+libsodium is another option with good portability.
+.Pp
+There are many
+.Xr abort 3
+calls in lieu of proper error handling.
+.Pp
+The lack of unit tests.

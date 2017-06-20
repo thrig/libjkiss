@@ -7,13 +7,11 @@
 
 #include <fcntl.h>
 #include <pthread.h>
-#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <unistd.h>
 
 typedef struct jkiss64_seed {
-    bool seeded;
     uint64_t x;
     uint64_t y;
     uint32_t c1;
@@ -22,9 +20,11 @@ typedef struct jkiss64_seed {
     uint32_t z2;
 } jkiss64_seed_t;
 
+jkiss64_seed_t * jkiss64_getseed(void);
 int jkiss64_init(void (*seed_func) (jkiss64_seed_t * seed));
+int jkiss64_init_thread(void);
 uint64_t jkiss64_rand(void);
-uint64_t jkiss64_uniform(uint64_t upper_bound);
 void jkiss64_reseed(void);
+uint64_t jkiss64_uniform(uint64_t upper_bound);
 
 #endif

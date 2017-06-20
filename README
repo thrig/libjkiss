@@ -2,11 +2,11 @@ libjkiss - 64-bit KISS rng with pthread support
 
 Build and install along the lines of:
 
-  export AUTOMAKE_VERSION=1.15
-  export AUTOCONF_VERSION=2.69
-  autoreconf -i
-  ./configure [--prefix=...] && make && make install
-
+    unset CFLAGS
+    export AUTOMAKE_VERSION=1.15
+    export AUTOCONF_VERSION=2.69
+    autoreconf -i
+    ./configure [--prefix=...] && make && make install
 
 This is a public domain JLKISS64 implementation - a KISS pseudo-random
 number generator (pRNG) with 64-bit operations and thread-independent
@@ -17,44 +17,25 @@ may supply a custom seed initialization function; otherwise, the seed is
 set from arc4random(3) calls, or if that is not available, by reading
 from a random device.
 
-Mac OS X systems may need to remove the
+Mac OS X systems may need to remove
 
-  -Wl,-rpath=${libdir}
+    -Wl,-rpath=${libdir}
 
-bit from the *.in file, unless ld(1) is changed to support that; other
-platforms can use this to avoid the need to set LD_LIBRARY_PATH (and
-consequent slow-downs and other problems) if installing this library
-to some custom directory.
+from the jkiss.pc.in file before building this library, or to manually
+remove that string for anything compiled against this library:
+
+    $ pkg-config --cflags --libs jkiss
+    -I.../include -L.../lib -Wl,-rpath=.../lib -ljkiss
+    $ export CFLAGS="-I.../include -L.../lib -ljkiss"
+    $ make somethingelse...
 
 Linux systems may need to install libbsd and the appropriate development
 bits for such, then ./configure with:
 
-  --with-libbsd
+    --with-libbsd
 
-Otherwise, lacking arc4random(3), the default seed function will try to
+Otherwise lacking arc4random(3) the default seed function will try to
 read from a random device (/dev/random by default). This file can be
 adjusted at ./configure time with:
 
-  --with-random-device=/dev/urandom
-
-
-Bugs and feature requests should be directed to:
-
-https://github.com/thrig/libjkiss
-
-
-COPYRIGHT AND LICENCE
-
-Copyright (C) 2015-2016 Jeremy Mates
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+    --with-random-device=/dev/urandom

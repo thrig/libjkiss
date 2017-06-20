@@ -30,7 +30,7 @@ int main(void)
     pthread_t *tids;
     struct timespec wait;
 
-    setvbuf(stdout, (char *)NULL, _IOLBF, (size_t) 0);
+    setvbuf(stdout, (char *) NULL, _IOLBF, (size_t) 0);
 
     jkiss64_init(set_seed);
 
@@ -69,6 +69,8 @@ void set_seed(jkiss64_seed_t * seed)
 void *worker(void *threadnum)
 {
     int x = (int) threadnum;
+
+    jkiss64_init_thread();
 
     for (unsigned int i = 0; i < ITERATIONS; i++) {
         printf("thread %d rand %llu\n", x, jkiss64_rand());

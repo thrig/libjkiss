@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# r-fu is from https://github.com/thrig/r-fu
+
+make -q threadrate
+
+for t in 1 2 4 8 16; do
+    ./threadrate -c 1000000 -t $t \
+    | awk '{print $NF}' \
+    | r-fu summary - \
+    | grep elem \
+    | awk '{print $2, $4}';
+done

@@ -40,23 +40,19 @@ int main(int argc, char *argv[])
 
     jkiss64_init(NULL);
 
-    setvbuf(stdout, (char *)NULL, _IOLBF, (size_t) 0);
+    setvbuf(stdout, (char *) NULL, _IOLBF, (size_t) 0);
 
     while ((ch = getopt(argc, argv, "h?c:R:t:")) != -1) {
         switch (ch) {
-
         case 'c':
             Flag_Count = flagtoul(ch, optarg, 1UL, ULONG_MAX);
             break;
-
         case 'R':
             Flag_Range = flagtoul(ch, optarg, 1UL, ULONG_MAX);
             break;
-
         case 't':
             Flag_Threads = flagtoul(ch, optarg, 1UL, ULONG_MAX);
             break;
-
         case 'h':
         case '?':
         default:
@@ -100,6 +96,8 @@ void emit_help(void)
 
 void *worker(void *unused)
 {
+    jkiss64_init_thread();
+
     for (unsigned long i = 0; i < Flag_Count; i++)
         printf("%llu\n", jkiss64_uniform(Flag_Range));
 

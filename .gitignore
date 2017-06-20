@@ -12,10 +12,6 @@ config.status
 config.sub
 configure
 depcomp
-eg/bias
-eg/customseed
-eg/threadrate
-eg/uniform-bias
 install-sh
 jkiss.pc
 lib/.deps

@@ -4,7 +4,7 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: jkiss
-Description: 64-bit KISS rng with pthread support
+Description: 64-bit KISS pRNG with pthread support
 Version: @PACKAGE_VERSION@
 Libs: -Wl,-rpath=${libdir} -L${libdir} -ljkiss
 Cflags: -I${includedir}
