@@ -95,18 +95,17 @@ uint64_t jkiss64_uniform(uint64_t upper_bound)
 
 void jkiss64_seeder(jkiss64_seed_t * seed)
 {
+    seed->y = 0;
+    seed->c1 = seed->z1 = seed->c2 = seed->z2 = 0;
 #ifdef HAVE_ARC4RANDOM
     seed->x = arc4random() | ((uint64_t) arc4random() << 32);
-    seed->y = 0;
     while (seed->y == 0) {
         seed->y = arc4random() | ((uint64_t) arc4random() << 32);
     }
-    seed->c1 = seed->z1 = 0;
     while (seed->c1 == 0 && seed->z1 == 0) {
         seed->c1 = arc4random();
         seed->z1 = arc4random();
     }
-    seed->c2 = seed->z2 = 0;
     while (seed->c2 == 0 && seed->z2 == 0) {
         seed->c2 = arc4random();
         seed->z2 = arc4random();
@@ -121,14 +120,12 @@ void jkiss64_seeder(jkiss64_seed_t * seed)
         if (read(fd, &seed->y, sizeof(uint64_t)) != sizeof(uint64_t))
             abort();
     }
-    seed->c1 = seed->z1 = 0;
     while (seed->c1 == 0 && seed->z1 == 0) {
         if (read(fd, &seed->c1, sizeof(uint32_t)) != sizeof(uint32_t))
             abort();
         if (read(fd, &seed->z1, sizeof(uint32_t)) != sizeof(uint32_t))
             abort();
     }
-    seed->c2 = seed->z2 = 0;
     while (seed->c2 == 0 && seed->z2 == 0) {
         if (read(fd, &seed->c2, sizeof(uint32_t)) != sizeof(uint32_t))
             abort();
