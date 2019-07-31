@@ -48,5 +48,22 @@ AC_TYPE_UINT64_T
 AC_FUNC_MALLOC
 AC_CHECK_FUNCS([arc4random])
 
+# KLUGE copied from goptfoo, somewhat servicable means to setup rpath
+# linking so do not need LD_LIBRARY_PATH foo
+AC_ARG_ENABLE([macos-rpath],
+    [  --enable-macos-rpath    enable macOS rpath flags for linker],
+    [macos_rpath=${enableval}], [macos_rpath=no])
+AC_ARG_ENABLE([the-rpath],
+    [  --enable-the-rpath      enable rpath flag for linker],
+    [the_rpath=${enableval}], [the_rpath=no])
+
+if test "x${macos_rpath}" = xyes; then
+    AC_SUBST([RPATH_FOO], ["-Wl,-macosx_version_min -Wl,10.11 -Wl,-rpath -Wl,\${libdir}"])
+elif test "x${the_rpath}" = xyes; then
+    AC_SUBST([RPATH_FOO], ["-Wl,-R \${libdir}"])
+else
+    AC_SUBST([RPATH_FOO], [""])
+fi
+
 AC_CONFIG_FILES([Makefile lib/Makefile man/Makefile jkiss.pc])
 AC_OUTPUT
