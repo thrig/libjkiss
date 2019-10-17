@@ -17,6 +17,13 @@ build and install along the lines of
     autoreconf -i
     ./configure [--prefix=...] && make && make install
 
+highly recommended is the --enable-the-rpath flag (or on macOS
+--enable-macos-rpath) to avoid the need for LD_LIBRARY_PATH tomfoolery:
+
+    ./configure --enable-the-rpath \
+      --prefix=$HOME/usr/`uname``uname -r`-`uname -m`
+    make && make install
+
 lacking arc4random(3) the default seed function will try to read from a
 random device (/dev/random by default). this file can be adjusted at
 configure time with:
