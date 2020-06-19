@@ -8,7 +8,7 @@
 #include "jkiss.h"
 
 #ifndef DEV_RANDOM
-#define DEV_RANDOM "/dev/random"
+#define DEV_RANDOM "/dev/urandom"
 #endif
 
 void (*Re_Seed) (jkiss64_seed_t * seed);

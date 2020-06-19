@@ -25,7 +25,7 @@ highly recommended is the --enable-the-rpath flag (or on macOS
     make && make install
 
 lacking arc4random(3) the default seed function will try to read from a
-random device (/dev/random by default). this file can be adjusted at
+random device (/dev/urandom by default). this file can be adjusted at
 configure time with:
 
-    --with-random-device=/dev/urandom
+    --with-random-device=...

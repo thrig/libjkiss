@@ -9,7 +9,7 @@ AC_CONFIG_HEADERS([config.h])
 m4_include(m4/macros/with.m4)
 
 ARG_WITH_SUBST([random-device],
-  [/dev/random],
+  [/dev/urandom],
   [set the device to read real random data from])
 
 AC_ARG_WITH([libbsd],
